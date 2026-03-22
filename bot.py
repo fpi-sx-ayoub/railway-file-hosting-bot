@@ -539,6 +539,15 @@ class DockerService:
             if ftype == "zip":
                 ex = self._extract_zip(filepath)
                 if not ex: return None, None
+                
+                # Try to install requirements if exists
+                req_file = os.path.join(ex["dir"], "requirements.txt")
+                if os.path.exists(req_file):
+                    try:
+                        subprocess.run([sys.executable, "-m", "pip", "install", "-r", req_file], 
+                                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    except Exception: pass
+
                 main = os.path.join(ex["dir"], ex["main"])
                 ext  = ex["main"].split(".")[-1].lower()
                 return self._sub_run(main, ext, port)
