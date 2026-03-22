@@ -5,8 +5,39 @@
 
 import os, sys, subprocess
 
-# ── تثبيت تلقائي (تم التعطيل للاستضافة) ─────────────────────────
-# تم نقل التثبيت إلى Dockerfile لضمان السرعة والاستقرار في Railway
+# ── تثبيت تلقائي ───────────────────────────────────────────────
+def _install_sys():
+    subprocess.run(["apt-get","update","-y"],
+                   stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    for t in ["curl","wget","gnupg","ca-certificates",
+              "lsb-release","apt-transport-https",
+              "software-properties-common","php-cli","nodejs","npm"]:
+        if subprocess.run(["which",t],capture_output=True).returncode != 0:
+            subprocess.run(["apt-get","install","-y",t],
+                           stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+    if subprocess.run(["which","docker"],capture_output=True).returncode != 0:
+        try:
+            subprocess.run("curl -fsSL https://get.docker.com | sh",
+                           shell=True,check=True,
+                           stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            for cmd in [["systemctl","start","docker"],
+                        ["systemctl","enable","docker"],
+                        ["usermod","-aG","docker",
+                         os.environ.get("USER","root")]]:
+                subprocess.run(cmd,stdout=subprocess.DEVNULL,
+                               stderr=subprocess.DEVNULL)
+        except Exception:
+            pass
+
+def _install_py():
+    for p in ["python-telegram-bot==20.7","docker==6.1.3",
+              "python-dotenv==1.0.0","requests","psutil"]:
+        subprocess.check_call([sys.executable,"-m","pip",
+                               "install","--quiet",p])
+
+if os.geteuid() == 0:
+    _install_sys()
+_install_py()
 
 
 # ── استيرادات ──────────────────────────────────────────────────
