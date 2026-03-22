@@ -832,7 +832,10 @@ async def handle_file(upd: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     virus_result = None
     if db.get_setting("virus_scan", "1") == "1":
-        await msg.edit_text("🦠 جارٍ فحص الملف ...")
+        try:
+            await msg.edit_text("🦠 جارٍ فحص الملف ...")
+        except Exception:
+            pass
         virus_result = VirusScanner.scan(filepath, ext)
 
     fid = db.add_file(uid, new_name, orig_name, filepath,
@@ -896,13 +899,22 @@ async def handle_file(upd: Update, ctx: ContextTypes.DEFAULT_TYPE):
     else:
         status_txt = "⏳ الحالة: في انتظار موافقة المالك"
 
-    await msg.edit_text(
-        f"✅ تم رفع الملف بنجاح\n"
-        f"📁 الاسم : {orig_name}\n"
-        f"📦 الحجم : {doc.file_size/1024:.1f} KB\n"
-        f"🔤 النوع : {ext.upper()}\n"
-        f"{status_txt}"
-    )
+    try:
+        await msg.edit_text(
+            f"✅ تم رفع الملف بنجاح\n"
+            f"📁 الاسم : {orig_name}\n"
+            f"📦 الحجم : {doc.file_size/1024:.1f} KB\n"
+            f"🔤 النوع : {ext.upper()}\n"
+            f"{status_txt}"
+        )
+    except Exception:
+        await upd.message.reply_text(
+            f"✅ تم رفع الملف بنجاح\n"
+            f"📁 الاسم : {orig_name}\n"
+            f"📦 الحجم : {doc.file_size/1024:.1f} KB\n"
+            f"🔤 النوع : {ext.upper()}\n"
+            f"{status_txt}"
+        )
 
 
 # ════════════════════════════════════════════════════════════════
