@@ -1141,8 +1141,13 @@ async def button_handler(upd: Update, ctx: ContextTypes.DEFAULT_TYPE):
         if f[1] != uid and uid != OWNER_ID:
             await q.answer("❌ هذا الملف ليس لك", show_alert=True); return
         log = dkr.logs(f[9])
+        if log:
+            log = log.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+            log = log[-3500:]
+        else:
+            log = "لا يوجد لوجز متاح"
         txt = f"📜 <b>لوجز {f[3]}</b>\n\n"
-        txt += f"<code>{log[-3500:] if log else 'لا يوجد لوجز متاح'}</code>"
+        txt += f"<code>{log}</code>"
         await q.edit_message_text(
             txt, parse_mode=ParseMode.HTML,
             reply_markup=InlineKeyboardMarkup([[
