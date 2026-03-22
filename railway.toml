@@ -11,3 +11,8 @@ restartPolicyMaxRetries = 10
 # and doesn't expose a web server.
 [deploy.healthcheck]
 enabled = false
+
+[mounts]
+# ربط مجلد data بمساحة تخزين دائمة في Railway
+mountPath = "data"
+volumeName = "bot-data"

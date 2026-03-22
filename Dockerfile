@@ -23,8 +23,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application
 COPY . .
 
-# Create necessary directories
-RUN mkdir -p uploads logs
+# Create persistent data directory
+RUN mkdir -p data/uploads data/logs
 
 # Expose port (Railway uses PORT env var)
 EXPOSE 8080

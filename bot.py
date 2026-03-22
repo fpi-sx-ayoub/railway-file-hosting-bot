@@ -47,9 +47,13 @@ OWNER_USER   = os.getenv("OWNER_USERNAME","noseyrobot")
 TEAM_NAME    = "FpI sX tEaM"
 DOCKER_NET   = os.getenv("DOCKER_NETWORK","bridge")
 
-UPLOAD_DIR   = "uploads"
-DB_PATH      = "bot_data.db"
-LOGS_DIR     = "logs"
+# ── مسارات التخزين الدائم (تم توحيدها لتتوافق مع Volume) ──────
+DATA_DIR     = "data"
+UPLOAD_DIR   = os.path.join(DATA_DIR, "uploads")
+DB_PATH      = os.path.join(DATA_DIR, "bot_data.db")
+LOGS_DIR     = os.path.join(DATA_DIR, "logs")
+
+os.makedirs(DATA_DIR,   exist_ok=True)
 
 MAX_FILE_MB  = 100
 ALLOWED_EXT  = ["py","php","js","sh","zip"]
