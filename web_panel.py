@@ -514,6 +514,7 @@ pre.log{background:#070a16;border:1px solid rgba(255,255,255,.06);color:#93ffb0;
     <button class="tab" data-tab="users">👥 المستخدمون</button>
     <button class="tab" data-tab="files">📁 ملفات المستخدمين</button>
     <button class="tab" data-tab="admins">👑 المشرفون</button>
+    <button class="tab" data-tab="settings">⚙️ الإعدادات</button>
     <button class="tab" data-tab="logs">📜 لوجز البوت</button>
   </div>
 
@@ -564,6 +565,33 @@ pre.log{background:#070a16;border:1px solid rgba(255,255,255,.06);color:#93ffb0;
         <tbody id="admins-tbody"></tbody>
       </table>
     </div>
+  </div>
+
+  <div class="card panel" id="p-settings">
+    <div class="panel-head"><h3>⚙️ إعدادات البوت</h3></div>
+    <div id="settings-result"></div>
+    <div class="field">
+      <label>BOT TOKEN</label>
+      <input type="text" id="bot-token" placeholder="أدخل توكن البوت">
+    </div>
+    <div class="field">
+      <label>BOT USERNAME (بدون @)</label>
+      <input type="text" id="bot-username" placeholder="مثال: XcT_x_HostinG_BoT">
+    </div>
+    <div class="field">
+      <label>OWNER ID</label>
+      <input type="number" id="owner-id" placeholder="مثال: 8695276303">
+    </div>
+    <div class="field">
+      <label>OWNER USERNAME (بدون @)</label>
+      <input type="text" id="owner-username" placeholder="مثال: XcT_xAyOuB">
+    </div>
+    <div class="field">
+      <label>ADMIN PASSWORD</label>
+      <input type="password" id="admin-password" placeholder="كلمة مرور اللوحة">
+    </div>
+    <button class="btn btn-primary" onclick="loadSettings()">🔄 تحميل الإعدادات الحالية</button>
+    <button class="btn btn-success" onclick="saveSettings()" style="margin-right:10px">💾 حفظ الإعدادات</button>
   </div>
 
   <div class="card panel" id="p-logs">
@@ -763,6 +791,43 @@ async function refreshFileLog(){
 document.getElementById('file-log-refresh').onclick = refreshFileLog;
 document.getElementById('file-log-modal').addEventListener('click', e=>{ if(e.target.id==='file-log-modal') closeFileLogModal(); });
 
+async function loadSettings(){
+  const r = await api('/api/settings');
+  if(r.ok){
+    document.getElementById('bot-token').value = r.data.BOT_TOKEN || '';
+    document.getElementById('bot-username').value = r.data.BOT_USERNAME || '';
+    document.getElementById('owner-id').value = r.data.OWNER_ID || '';
+    document.getElementById('owner-username').value = r.data.OWNER_USERNAME || '';
+    document.getElementById('admin-password').value = r.data.ADMIN_PASSWORD || '';
+    document.getElementById('settings-result').innerHTML = '<div class="alert alert-success">✅ تم تحميل الإعدادات</div>';
+  } else {
+    document.getElementById('settings-result').innerHTML = '<div class="alert alert-error">❌ ' + esc(r.error || 'فشل التحميل') + '</div>';
+  }
+}
+async function saveSettings(){
+  if(!confirm('حفظ الإعدادات الجديدة؟ سيتم إعادة تشغيل البوت.')) return;
+  const data = {
+    BOT_TOKEN: document.getElementById('bot-token').value.trim(),
+    BOT_USERNAME: document.getElementById('bot-username').value.trim(),
+    OWNER_ID: document.getElementById('owner-id').value.trim(),
+    OWNER_USERNAME: document.getElementById('owner-username').value.trim(),
+    ADMIN_PASSWORD: document.getElementById('admin-password').value.trim()
+  };
+  const box = document.getElementById('settings-result');
+  box.innerHTML = '<div class="alert alert-info">⏳ جارٍ الحفظ...</div>';
+  try{
+    const r = await api('/api/settings', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+    if(r.ok){
+      box.innerHTML = '<div class="alert alert-success">✅ تم حفظ الإعدادات بنجاح. سيتم إعادة تشغيل البوت...</div>';
+      setTimeout(()=>{ location.reload(); }, 2000);
+    } else {
+      box.innerHTML = '<div class="alert alert-error">❌ ' + esc(r.error || 'فشل الحفظ') + '</div>';
+    }
+  }catch(e){
+    box.innerHTML = '<div class="alert alert-error">❌ ' + esc(e.message || e) + '</div>';
+  }
+}
+
 refreshAll();
 setInterval(refreshAll, 8000);
 </script>
@@ -946,6 +1011,73 @@ def api_logs():
             return jsonify({'log': handle.read()[-20000:]})
     except Exception as exc:
         return jsonify({'log': f'خطأ أثناء قراءة السجل: {exc}'})
+
+
+@app.route('/api/settings')
+@require_login
+def api_get_settings():
+    return jsonify({
+        'ok': True,
+        'data': {
+            'BOT_TOKEN': BOT_TOKEN,
+            'BOT_USERNAME': BOT_USERNAME,
+            'OWNER_ID': str(OWNER_ID),
+            'OWNER_USERNAME': OWNER_USERNAME,
+            'ADMIN_PASSWORD': ADMIN_PASSWORD
+        }
+    })
+
+
+@app.route('/api/settings', methods=['POST'])
+@require_login
+def api_save_settings():
+    global BOT_TOKEN, BOT_USERNAME, OWNER_ID, OWNER_USERNAME, ADMIN_PASSWORD
+    
+    data = request.get_json(silent=True) or {}
+    
+    bot_token = (data.get('BOT_TOKEN') or '').strip()
+    bot_username = (data.get('BOT_USERNAME') or '').strip()
+    owner_id = (data.get('OWNER_ID') or '').strip()
+    owner_username = (data.get('OWNER_USERNAME') or '').strip()
+    admin_password = (data.get('ADMIN_PASSWORD') or '').strip()
+    
+    if not all([bot_token, bot_username, owner_id, owner_username, admin_password]):
+        return jsonify({'ok': False, 'error': 'جميع الحقول مطلوبة'}), 400
+    
+    try:
+        owner_id_int = int(owner_id)
+    except ValueError:
+        return jsonify({'ok': False, 'error': 'OWNER_ID يجب أن يكون رقما'}), 400
+    
+    env_content = f"""BOT_TOKEN={bot_token}
+BOT_USERNAME={bot_username}
+OWNER_ID={owner_id_int}
+OWNER_USERNAME={owner_username}
+ADMIN_PASSWORD={admin_password}
+SECRET_KEY={SECRET_KEY}
+PORT=10000
+"""
+    
+    try:
+        with open('.env', 'w', encoding='utf-8') as f:
+            f.write(env_content)
+        
+        BOT_TOKEN = bot_token
+        BOT_USERNAME = bot_username
+        OWNER_ID = owner_id_int
+        OWNER_USERNAME = owner_username
+        ADMIN_PASSWORD = admin_password
+        
+        stop_bot_process()
+        time.sleep(1)
+        start_bot_process()
+        
+        return jsonify({
+            'ok': True,
+            'message': 'تم حفظ الإعدادات وإعادة تشغيل البوت'
+        })
+    except Exception as exc:
+        return jsonify({'ok': False, 'error': f'خطأ: {str(exc)}'}), 500
 
 
 def auto_start_bot():
