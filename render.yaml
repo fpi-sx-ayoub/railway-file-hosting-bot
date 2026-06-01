@@ -11,11 +11,11 @@ services:
       - key: BOT_TOKEN
         sync: false
       - key: BOT_USERNAME
-        value: "@MTX_SX_TEAM_BOT"
+        value: "@XcT_x_HostinG_BoT"
       - key: OWNER_ID
         sync: false
       - key: OWNER_USERNAME
-        value: "noseyrobot"
+        value: "XcT_xAyOuB"
       - key: ADMIN_PASSWORD
         sync: false
       - key: SECRET_KEY

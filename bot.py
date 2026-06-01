@@ -71,11 +71,11 @@ logging.basicConfig(
 LOG = logging.getLogger(__name__)
 load_dotenv()
 
-BOT_TOKEN    = os.getenv("BOT_TOKEN",    "8590832057:AAGR5Elyd2yligbYcB_v7zE_m43XCpDFY14")
-BOT_USERNAME = os.getenv("BOT_USERNAME", "@MTX_SX_TEAM_BOT")
+BOT_TOKEN    = os.getenv("BOT_TOKEN", "")
+BOT_USERNAME = os.getenv("BOT_USERNAME", "@XcT_x_HostinG_BoT")
 OWNER_ID     = int(os.getenv("OWNER_ID", "8695276303"))
-OWNER_USER   = os.getenv("OWNER_USERNAME","noseyrobot")
-TEAM_NAME    = "FpI sX tEaM"
+OWNER_USER   = os.getenv("OWNER_USERNAME", "XcT_xAyOuB")
+TEAM_NAME    = "XcT x TeaM"
 DOCKER_NET   = os.getenv("DOCKER_NETWORK","bridge")
 
 # ── مسارات التخزين الدائم (تم توحيدها لتتوافق مع Volume) ──────
