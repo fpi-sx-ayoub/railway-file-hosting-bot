@@ -71,9 +71,9 @@ logging.basicConfig(
 LOG = logging.getLogger(__name__)
 load_dotenv()
 
-BOT_TOKEN    = os.getenv("BOT_TOKEN",    "8466789309:AAGSRU-Dmk-u9MQU0TyzP4sk-VW6cfVa6Ec")
+BOT_TOKEN    = os.getenv("BOT_TOKEN",    "8590832057:AAGR5Elyd2yligbYcB_v7zE_m43XCpDFY14")
 BOT_USERNAME = os.getenv("BOT_USERNAME", "@MTX_SX_TEAM_BOT")
-OWNER_ID     = int(os.getenv("OWNER_ID", "7375963526"))
+OWNER_ID     = int(os.getenv("OWNER_ID", "8695276303"))
 OWNER_USER   = os.getenv("OWNER_USERNAME","noseyrobot")
 TEAM_NAME    = "FpI sX tEaM"
 DOCKER_NET   = os.getenv("DOCKER_NETWORK","bridge")

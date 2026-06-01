@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: fpi-sx-bot
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: BOT_USERNAME
+        value: "@MTX_SX_TEAM_BOT"
+      - key: OWNER_ID
+        sync: false
+      - key: OWNER_USERNAME
+        value: "noseyrobot"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: "10000"
+      - key: PYTHONUNBUFFERED
+        value: "1"

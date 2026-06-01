@@ -8,26 +8,24 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     git \
+    procps \
     && rm -rf /var/lib/apt/lists/*
 
-# Set terminal environment variable
 ENV TERM=xterm
+ENV PYTHONUNBUFFERED=1
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements and install python dependencies
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt psutil
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
 COPY . .
 
-# Create persistent data directory
+# Persistent data
 RUN mkdir -p data/uploads data/logs
 
-# Expose port (Railway uses PORT env var)
-EXPOSE 8080
+# Render uses $PORT (defaults 10000)
+EXPOSE 10000
 
-# Run the bot
-CMD ["python", "bot.py"]
+# Start the web panel (which auto-starts the bot)
+CMD ["python", "-u", "web_panel.py"]
